@@ -1,5 +1,6 @@
 const path = require("path");
 const {promises: fs} = require("fs");
+const remote = require("@electron/remote");
 
 let model = {
     idcount: 0,
@@ -61,7 +62,40 @@ const saveModel = async (model, filePath) => {
     }
 };
 
-document.querySelector("#save-btn").addEventListener("click", () => {
-    const p = path.join(__dirname, "mytodos.json");
-    saveModel(model, p);
+document.querySelector("#save-btn").addEventListener("click", async () => {
+    const dialog = remote.dialog;
+    const browserWin = remote.getCurrentWindow();
+    const opts = {
+        title: "To Do Liste speichern",
+        defaultPath: path.join(process.env.HOME || process.env.HOMEPATH, "todos.json"),
+    };
+    const {canceled, filePath} = await dialog.showSaveDialog(browserWin, opts);
+    if (canceled || !filePath) return;
+
+    saveModel(model, filePath);
 });
+
+const loadModel = async () => {
+    const dialog = remote.dialog;
+    const browserWin = remote.getCurrentWindow();
+    const opts = {
+        title: "To Do Liste öffnen",
+        filePath: process.env.HOME || process.env.HOMEPATH,
+        buttonLabel: "Öffnen",
+        properties: ["openFile"]
+    };
+
+    const {canceled, filePaths} = await dialog.showOpenDialog(browserWin, opts);
+    if (canceled || filePaths.length === 0) return;
+
+    const json = await fs.readFile(filePaths[0], "utf8");
+    return JSON.parse(json);
+};
+
+document.querySelector("#load-btn").addEventListener("click", async () => {
+    const newModel = await loadModel();
+    if (!newModel) return;
+    model = newModel;
+    render(model);
+});
+

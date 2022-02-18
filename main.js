@@ -1,6 +1,9 @@
 const {app, BrowserWindow} = require("electron");
 const path = require("path");
 const url = require("url");
+const remote = require("@electron/remote/main");
+
+remote.initialize();
 
 app.on("ready", () => {
     const win = new BrowserWindow({
@@ -17,4 +20,5 @@ app.on("ready", () => {
         protocol: "file",
         slashes: true
     }));
+    remote.enable(win.webContents);
 });
