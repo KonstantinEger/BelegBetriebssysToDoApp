@@ -1,3 +1,6 @@
+const path = require("path");
+const {promises: fs} = require("fs");
+
 let model = {
     idcount: 0,
     todos: []
@@ -48,4 +51,17 @@ document.querySelector("#todo-input").addEventListener("change", event => {
 document.querySelector("#clear-btn").addEventListener("click", () => {
     model.todos = model.todos.filter(t => !t.done);
     render(model);
+});
+
+const saveModel = async (model, filePath) => {
+    try {
+        await fs.writeFile(filePath, JSON.stringify(model));
+    } catch (err) {
+        alert("There was an error saving the file");
+    }
+};
+
+document.querySelector("#save-btn").addEventListener("click", () => {
+    const p = path.join(__dirname, "mytodos.json");
+    saveModel(model, p);
 });
