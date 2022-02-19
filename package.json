@@ -10,8 +10,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@electron/remote": "^2.0.4"
+  },
   "devDependencies": {
-    "@electron/remote": "^2.0.4",
     "electron": "^17.0.1"
   }
 }
